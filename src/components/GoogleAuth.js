@@ -21,17 +21,17 @@ const GoogleAuth = props => {
 
           function onAuthChange(isSignedIn) {
             if (isSignedIn) {
-              // Call signIn action from mapDispatchToProps
-              props.setSignIn();
+              // Call setSignIn action from mapDispatchToProps with userId
+              props.setSignIn(auth.currentUser.get().getId());
             } else {
-              // Call signOut action from mapDispatchToProps
+              // Call setSignOut action from mapDispatchToProps
              props.setSignOut();
             }
           }
         });
     });
     return () => {};
-  }, [props]);
+  }, []);
 
   const onSignInClick = () => window.gapi.auth2.getAuthInstance().signIn();
 
@@ -60,13 +60,14 @@ const GoogleAuth = props => {
 
 const mapStateToProps = state => {
   return {
-    isSignedIn: state.auth.isSignedIn, // state from authReducer.js
+    isSignedIn: state.auth.isSignedIn, // state from reducers/authReducer.js
+    userId: state.auth.userId, // state from reducers/authReducer.js
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    setSignIn: () => dispatch(signIn()), // dispatch signIn from store/actions
+    setSignIn: (userId) => dispatch(signIn(userId)), // dispatch signIn from store/actions
     setSignOut: () => dispatch(signOut()) // dispatch signOut from store/actions
   }
 }
