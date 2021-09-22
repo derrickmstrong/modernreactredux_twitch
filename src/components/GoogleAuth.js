@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux'
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 import { signIn, signOut } from '../store/actions';
 
-const GoogleAuth = () => {
-  const [isSignedIn, setIsSignedIn] = useState(null);
-
+const GoogleAuth = props => {
+  console.log(props)
   useEffect(() => {
     window.gapi.load('client:auth2', () => {
       window.gapi.client
@@ -13,43 +12,43 @@ const GoogleAuth = () => {
           scope: 'email',
         })
         .then(() => {
+          // Get auth instance from Google API
           const auth = window.gapi.auth2.getAuthInstance();
-          setIsSignedIn(auth.isSignedIn.get());
+          // Check initial isSignedIn status
+          onAuthChange(auth.isSignedIn.get());
+          // Listen for changes in isSignedIn
           auth.isSignedIn.listen(onAuthChange);
+
           function onAuthChange(isSignedIn) {
             if (isSignedIn) {
-                signIn()
+              // Call signIn action from mapDispatchToProps
+              props.setSignIn();
             } else {
-                signOut()
+              // Call signOut action from mapDispatchToProps
+             props.setSignOut();
             }
           }
         });
     });
     return () => {};
-  }, []);
+  }, [props]);
 
   const onSignInClick = () => window.gapi.auth2.getAuthInstance().signIn();
 
   const onSignOutClick = () => window.gapi.auth2.getAuthInstance().signOut();
 
   const renderAuthButton = () => {
-    if (isSignedIn === null) {
+    if (props.isSignedIn === null) {
       return null;
-    } else if (isSignedIn) {
+    } else if (props.isSignedIn) {
       return (
-        <button
-          className='ui red google button'
-          onClick={onSignOutClick}
-        >
+        <button className='ui red google button' onClick={onSignOutClick}>
           <i className='google icon'></i> Sign Out w/Google
         </button>
       );
     } else {
       return (
-        <button
-          className='ui blue google button'
-          onClick={onSignInClick}
-        >
+        <button className='ui blue google button' onClick={onSignInClick}>
           <i className='google icon'></i> Sign In w/Google
         </button>
       );
@@ -59,4 +58,17 @@ const GoogleAuth = () => {
   return <div>{renderAuthButton()}</div>;
 };
 
-export default connect(null, { signIn, signOut })(GoogleAuth);
+const mapStateToProps = state => {
+  return {
+    isSignedIn: state.auth.isSignedIn, // state from authReducer.js
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    setSignIn: () => dispatch(signIn()), // dispatch signIn from store/actions
+    setSignOut: () => dispatch(signOut()) // dispatch signOut from store/actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(GoogleAuth);
