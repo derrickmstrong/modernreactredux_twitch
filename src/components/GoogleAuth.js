@@ -1,63 +1,6 @@
-// Class-based GoogleAuth
-// import React from 'react'
-
-// class GoogleAuth extends React.Component {
-//     state = { isSignedIn: null }
-
-//     componentDidMount() {
-//         window.gapi.load('client:auth2', () => {
-//             window.gapi.client
-//               .init({
-//                 clientId:'393298322022-crqqujjp1q7rr0f4citnopp5diobg01e.apps.googleusercontent.com',
-//                 scope: 'email',
-//               })
-//               .then(() => {
-//                 this.auth = window.gapi.auth2.getAuthInstance();
-//                 this.onAuthChange();
-//                 this.auth.isSignedIn.listen(this.onAuthChange)
-//               });
-//     })
-// }
-
-// onAuthChange = () => {
-//     this.setState({ isSignedIn: this.auth.isSignedIn.get() });
-// };
-
-// renderAuthButton() {
-//     if (this.state.isSignedIn === null) {
-//         return <div>Loading...</div>
-//     } else if (this.state.isSignedIn) {
-//         return (
-//           <button
-//             className='ui basic button'
-//             onClick={() => window.gapi.auth2.getAuthInstance().signOut()}
-//           >
-//             <i className='icon user'></i> Sign Out
-//           </button>
-//         );
-//     } else {
-//         return (
-//           <button
-//             className='ui basic button'
-//             onClick={() => window.gapi.auth2.getAuthInstance().signIn()}
-//           >
-//             <i className='icon user'></i> Sign In
-//           </button>
-//         );
-//     }
-// }
-//     render() {
-//         return (
-//             <div>
-//                 {this.renderAuthButton()}
-//             </div>
-//         )
-//     }
-// }
-
-// export default GoogleAuth
-
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux'
+import { signIn, signOut } from '../store/actions';
 
 const GoogleAuth = () => {
   const [isSignedIn, setIsSignedIn] = useState(null);
@@ -73,8 +16,12 @@ const GoogleAuth = () => {
           const auth = window.gapi.auth2.getAuthInstance();
           setIsSignedIn(auth.isSignedIn.get());
           auth.isSignedIn.listen(onAuthChange);
-          function onAuthChange() {
-            setIsSignedIn(auth.isSignedIn.get());
+          function onAuthChange(isSignedIn) {
+            if (isSignedIn) {
+                signIn()
+            } else {
+                signOut()
+            }
           }
         });
     });
@@ -112,4 +59,4 @@ const GoogleAuth = () => {
   return <div>{renderAuthButton()}</div>;
 };
 
-export default GoogleAuth;
+export default connect(null, { signIn, signOut })(GoogleAuth);
