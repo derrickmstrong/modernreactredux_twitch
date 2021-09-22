@@ -1,3 +1,4 @@
+// Class-based GoogleAuth
 // import React from 'react'
 
 // class GoogleAuth extends React.Component {
@@ -80,9 +81,9 @@ const GoogleAuth = () => {
     return () => {};
   }, []);
 
-  const onSignIn = () => window.gapi.auth2.getAuthInstance().signIn();
+  const onSignInClick = () => window.gapi.auth2.getAuthInstance().signIn();
 
-  const onSignOut = () => window.gapi.auth2.getAuthInstance().signOut();
+  const onSignOutClick = () => window.gapi.auth2.getAuthInstance().signOut();
 
   const renderAuthButton = () => {
     if (isSignedIn === null) {
@@ -91,7 +92,7 @@ const GoogleAuth = () => {
       return (
         <button
           className='ui red google button'
-          onClick={onSignOut}
+          onClick={onSignOutClick}
         >
           <i className='google icon'></i> Sign Out w/Google
         </button>
@@ -100,7 +101,7 @@ const GoogleAuth = () => {
       return (
         <button
           className='ui blue google button'
-          onClick={onSignIn}
+          onClick={onSignInClick}
         >
           <i className='google icon'></i> Sign In w/Google
         </button>
