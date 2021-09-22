@@ -12,17 +12,37 @@
 //               })
 //               .then(() => {
 //                 this.auth = window.gapi.auth2.getAuthInstance();
-//                 this.setState({ isSignedIn: this.auth.isSignedIn.get() });
+//                 this.onAuthChange();
+//                 this.auth.isSignedIn.listen(this.onAuthChange)
 //               });
 //     })
 // }
+
+// onAuthChange = () => {
+//     this.setState({ isSignedIn: this.auth.isSignedIn.get() });
+// };
+
 // renderAuthButton() {
 //     if (this.state.isSignedIn === null) {
-//         return <div>I don't know if we are signed in</div>
+//         return <div>Loading...</div>
 //     } else if (this.state.isSignedIn) {
-//         return <div>I am signed in!</div>
+//         return (
+//           <button
+//             className='ui basic button'
+//             onClick={() => window.gapi.auth2.getAuthInstance().signOut()}
+//           >
+//             <i className='icon user'></i> Sign Out
+//           </button>
+//         );
 //     } else {
-//         return <div>I am not signed in</div>
+//         return (
+//           <button
+//             className='ui basic button'
+//             onClick={() => window.gapi.auth2.getAuthInstance().signIn()}
+//           >
+//             <i className='icon user'></i> Sign In
+//           </button>
+//         );
 //     }
 // }
 //     render() {
@@ -36,7 +56,7 @@
 
 // export default GoogleAuth
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 
 const GoogleAuth = () => {
   const [isSignedIn, setIsSignedIn] = useState(null);
@@ -51,23 +71,44 @@ const GoogleAuth = () => {
         .then(() => {
           const auth = window.gapi.auth2.getAuthInstance();
           setIsSignedIn(auth.isSignedIn.get());
+          auth.isSignedIn.listen(onAuthChange);
+          function onAuthChange() {
+            setIsSignedIn(auth.isSignedIn.get());
+          }
         });
     });
     return () => {};
   }, []);
 
+  const onSignIn = () => window.gapi.auth2.getAuthInstance().signIn();
+
+  const onSignOut = () => window.gapi.auth2.getAuthInstance().signOut();
+
   const renderAuthButton = () => {
-      if (isSignedIn === null) {
-          return <div>I don't know if we are signed in</div>
-      } else if (isSignedIn) {
-          return <div>I am signed in!</div>
-      } else {
-          return <div>I am not signed in!</div>
-      }
-  }
+    if (isSignedIn === null) {
+      return null;
+    } else if (isSignedIn) {
+      return (
+        <button
+          className='ui red google button'
+          onClick={onSignOut}
+        >
+          <i className='google icon'></i> Sign Out w/Google
+        </button>
+      );
+    } else {
+      return (
+        <button
+          className='ui blue google button'
+          onClick={onSignIn}
+        >
+          <i className='google icon'></i> Sign In w/Google
+        </button>
+      );
+    }
+  };
 
   return <div>{renderAuthButton()}</div>;
-}
+};
 
-export default GoogleAuth
-
+export default GoogleAuth;
